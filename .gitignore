@@ -1,0 +1,14 @@
+/node_modules/
+/.vs/
+/.vscode/
+/target/
+/logs/
+/dist/
+/bundle/
+/artifacts/
+/tools/github-cli/
+
+/tools/configure_launcher.py
+/.github/FUNDING.yml
+
+/.github/workflows/build.yml

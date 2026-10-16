@@ -1,0 +1,20 @@
+# Custom Language File for Launcher Customizer
+
+[ejs.app]
+title = "Fluxo Launcher"
+
+[ejs.landing]
+mediaGitHubURL = "https://github.com/chumalacuta/narutofluxo-launcher"
+mediaTwitterURL = "#"
+mediaInstagramURL = "#"
+mediaYouTubeURL = "#"
+mediaDiscordURL = "https://discord.gg/BTY9u5QpQp"
+
+[ejs.settings]
+sourceGithubLink = "https://github.com/chumalacuta/narutofluxo-launcher"
+supportLink = "https://discord.gg/BTY9u5QpQp"
+
+[ejs.welcome]
+welcomeHeader = "Bem-vindo ao Fluxo Launcher"
+welcomeDescription = "Esse é o launcher oficial do servidor Naruto Fluxo, que você poderá usar para jogar em nosso servidor!"
+welcomeDescCTA = "Esperamos que você tenha uma ótima experiência <3"
