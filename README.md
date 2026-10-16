@@ -2,7 +2,7 @@
 
 # NarutoFluxo Launcher
 
-**Versão 2.2.4 · Windows 64 bits**
+**Versão 2.2.5 · Windows 64 bits**
 
 ### [⬇ Baixar o instalador](https://github.com/chumalacuta/narutofluxo-launcher/releases/latest)
 
