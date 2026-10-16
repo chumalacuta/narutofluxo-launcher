@@ -27,10 +27,12 @@ app.whenReady().then(async () => {
   const start=Date.now()
   while(!win && Date.now()-start<15000) {win=BrowserWindow.getAllWindows()[0];if(!win) await new Promise(r=>setTimeout(r,100))}
   if(!win) throw new Error('No launcher window')
+  win.webContents.setBackgroundThrottling(false)
   await waitFor(win, "typeof DistroAPI !== 'undefined' && document.getElementById('welcomeButton')")
   await waitFor(win, "document.getElementById('welcomeContainer') && getComputedStyle(document.getElementById('welcomeContainer')).display !== 'none'")
   await waitFor(win, "getComputedStyle(document.getElementById('welcomeContainer')).opacity === '1'")
   await waitFor(win, "getComputedStyle(document.getElementById('loadingContainer')).display === 'none'")
+  await win.webContents.executeJavaScript('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
   fs.writeFileSync(path.join(output,'launcher-welcome.png'), (await win.webContents.capturePage()).toPNG())
   await win.webContents.executeJavaScript("document.getElementById('welcomeButton').click()")
   await waitFor(win,"getComputedStyle(document.getElementById('loginOptionsContainer')).display !== 'none'")
