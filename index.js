@@ -1,3 +1,4 @@
+require('./app/assets/js/console-pipe').install()
 const remoteMain = require('@electron/remote/main')
 remoteMain.initialize()
 
