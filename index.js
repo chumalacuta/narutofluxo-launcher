@@ -119,7 +119,7 @@ ipcMain.handle(SHELL_OPCODE.TRASH_ITEM, async (event, ...args) => {
 app.disableHardwareAcceleration()
 
 
-const REDIRECT_URI_PREFIX = 'https://login.microsoftonline.com/common/oauth2/nativeclient?'
+const {createMicrosoftLogin, createRedirectReceiver} = require('./app/assets/js/microsoft-login')
 
 // Microsoft Auth Login
 let msftAuthWindow
@@ -153,26 +153,23 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGIN, (ipcEvent, ...arguments_) => {
         }
     })
 
-    msftAuthWindow.webContents.on('did-navigate', (_, uri) => {
-        if (uri.startsWith(REDIRECT_URI_PREFIX)) {
-            let queries = uri.substring(REDIRECT_URI_PREFIX.length).split('#', 1).toString().split('&')
-            let queryMap = {}
-
-            queries.forEach(query => {
-                const [name, value] = query.split('=')
-                queryMap[name] = decodeURI(value)
-            })
-
-            ipcEvent.reply(MSFT_OPCODE.REPLY_LOGIN, MSFT_REPLY_TYPE.SUCCESS, queryMap, msftAuthViewSuccess)
-
-            msftAuthSuccess = true
-            msftAuthWindow.close()
-            msftAuthWindow = null
-        }
+    const login = createMicrosoftLogin(AZURE_CLIENT_ID)
+    const authWindow = msftAuthWindow
+    const receiveRedirect = createRedirectReceiver(login.state, queryMap => {
+        msftAuthSuccess = true
+        ipcEvent.reply(MSFT_OPCODE.REPLY_LOGIN, MSFT_REPLY_TYPE.SUCCESS, queryMap, msftAuthViewSuccess)
+        authWindow.close()
     })
+    const interceptRedirect = (event, uri) => {
+        if (receiveRedirect(event.url || uri)) event.preventDefault()
+    }
+    // Redeem immediately, before loading the nativeclient page, and only once.
+    authWindow.webContents.on('will-redirect', interceptRedirect)
+    authWindow.webContents.on('will-navigate', interceptRedirect)
+    authWindow.webContents.on('did-navigate', (event, uri) => receiveRedirect(event.url || uri))
+    authWindow.removeMenu()
+    authWindow.loadURL(login.url)
 
-    msftAuthWindow.removeMenu()
-    msftAuthWindow.loadURL(`https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?prompt=select_account&client_id=${AZURE_CLIENT_ID}&response_type=code&scope=XboxLive.signin%20offline_access&redirect_uri=https://login.microsoftonline.com/common/oauth2/nativeclient`)
 })
 
 // Microsoft Auth Logout

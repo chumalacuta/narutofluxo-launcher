@@ -16,6 +16,20 @@ const { AZURE_CLIENT_ID }      = require('./ipcconstants')
 const Lang = require('./langloader')
 
 const log = LoggerUtil.getLogger('AuthManager')
+const {describeMicrosoftFailure} = require('./microsoft-login')
+// The library's HTTP logger otherwise dumps request objects, tokens and cookies.
+const microsoftLog = LoggerUtil.getLogger('MicrosoftAuth')
+MicrosoftAuth.logger = {
+    error(message) { microsoftLog.error(String(message)) },
+    debug() {}
+}
+function microsoftResponseError(response, stage) {
+    if (response.microsoftErrorCode && response.microsoftErrorCode !== MicrosoftErrorCode.UNKNOWN) return microsoftErrorDisplayable(response.microsoftErrorCode)
+    const display = describeMicrosoftFailure(response, stage)
+    log.warn(display.desc)
+    return display
+}
+
 
 // Error messages
 
@@ -191,7 +205,7 @@ async function fullMicrosoftAuthFlow(entryCode, authMode) {
         if(authMode !== AUTH_MODE.MC_REFRESH) {
             const accessTokenResponse = await MicrosoftAuth.getAccessToken(entryCode, authMode === AUTH_MODE.MS_REFRESH, AZURE_CLIENT_ID)
             if(accessTokenResponse.responseStatus === RestResponseStatus.ERROR) {
-                return Promise.reject(microsoftErrorDisplayable(accessTokenResponse.microsoftErrorCode))
+                return Promise.reject(microsoftResponseError(accessTokenResponse, 'autorização Microsoft'))
             }
             accessToken = accessTokenResponse.data
             accessTokenRaw = accessToken.access_token
@@ -201,19 +215,19 @@ async function fullMicrosoftAuthFlow(entryCode, authMode) {
         
         const xblResponse = await MicrosoftAuth.getXBLToken(accessTokenRaw)
         if(xblResponse.responseStatus === RestResponseStatus.ERROR) {
-            return Promise.reject(microsoftErrorDisplayable(xblResponse.microsoftErrorCode))
+            return Promise.reject(microsoftResponseError(xblResponse, 'Xbox Live'))
         }
         const xstsResonse = await MicrosoftAuth.getXSTSToken(xblResponse.data)
         if(xstsResonse.responseStatus === RestResponseStatus.ERROR) {
-            return Promise.reject(microsoftErrorDisplayable(xstsResonse.microsoftErrorCode))
+            return Promise.reject(microsoftResponseError(xstsResonse, 'permissões Xbox'))
         }
         const mcTokenResponse = await MicrosoftAuth.getMCAccessToken(xstsResonse.data)
         if(mcTokenResponse.responseStatus === RestResponseStatus.ERROR) {
-            return Promise.reject(microsoftErrorDisplayable(mcTokenResponse.microsoftErrorCode))
+            return Promise.reject(microsoftResponseError(mcTokenResponse, 'autorização Minecraft'))
         }
         const mcProfileResponse = await MicrosoftAuth.getMCProfile(mcTokenResponse.data.access_token)
         if(mcProfileResponse.responseStatus === RestResponseStatus.ERROR) {
-            return Promise.reject(microsoftErrorDisplayable(mcProfileResponse.microsoftErrorCode))
+            return Promise.reject(microsoftResponseError(mcProfileResponse, 'perfil Minecraft'))
         }
         return {
             accessToken,
@@ -224,7 +238,7 @@ async function fullMicrosoftAuthFlow(entryCode, authMode) {
             mcProfile: mcProfileResponse.data
         }
     } catch(err) {
-        log.error(err)
+        log.error('Falha inesperada no fluxo Microsoft; detalhes sensíveis omitidos.')
         return Promise.reject(microsoftErrorDisplayable(MicrosoftErrorCode.UNKNOWN))
     }
 }

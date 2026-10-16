@@ -397,7 +397,7 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
                 console.log('Error getting authCode, is Azure application registered correctly?')
                 console.log(error)
                 console.log(errorDesc)
-                console.log('Full query map: ', queryMap)
+                // Never log the OAuth response query.
                 setOverlayContent(
                     error,
                     errorDesc,
