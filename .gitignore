@@ -12,3 +12,6 @@
 /.github/FUNDING.yml
 
 /.github/workflows/build.yml
+
+/fluxo-local.json
+/docs/

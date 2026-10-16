@@ -4,6 +4,10 @@ ROOT=Path(__file__).resolve().parents[1]
 SRC=Path(os.environ.get('FLUXO_CLIENT_DIR',Path.home()/'AppData/Roaming/.technic/modpacks/narutofluxo'))
 OUT=ROOT/'bundle';OBJECTS=OUT/'objects';OBJECTS.mkdir(parents=True,exist_ok=True)
 settings=json.loads((ROOT/'fluxo-settings.json').read_text());records=[];defaults=[];common_defaults=[]
+local_file=ROOT/'fluxo-local.json'
+local=json.loads(local_file.read_text(encoding='utf-8')) if local_file.exists() else {}
+server_address=os.environ.get('FLUXO_SERVER_ADDRESS') or local.get('serverAddress')
+if not server_address:raise RuntimeError('Configure FLUXO_SERVER_ADDRESS ou fluxo-local.json antes de gerar o pacote.')
 def artifact(data):
  h=hashlib.sha256(data).hexdigest();p=OBJECTS/h
  if not p.exists():p.write_bytes(data)
@@ -80,7 +84,7 @@ def fetchlib(lib):
   if data is None:raise RuntimeError(lib['name']+': '+str(errors))
  return module(lib['name'],name,'Library',data)
 with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:forge_module['subModules']=list(pool.map(fetchlib,libs))
-distro={'version':'2026.10.16','servers':[{'id':settings['serverId'],'name':'NarutoFluxo','description':'Servidor oficial NarutoFluxo • Minecraft 1.7.10','icon':None,'version':'2026.10.16','address':settings['serverAddress'],'minecraftVersion':'1.7.10','mainServer':True,'autoconnect':True,'javaOptions':{'supported':'8.x','suggestedMajor':8},'modules':[forge_module]+records}]}
+distro={'version':'2026.10.16','servers':[{'id':settings['serverId'],'name':'NarutoFluxo','description':'Servidor oficial NarutoFluxo • Minecraft 1.7.10','icon':None,'version':'2026.10.16','address':server_address,'minecraftVersion':'1.7.10','mainServer':True,'autoconnect':True,'javaOptions':{'supported':'8.x','suggestedMajor':8},'modules':[forge_module]+records}]}
 (OUT/'distribution.json').write_text(json.dumps(distro,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 (OUT/'defaults.json').write_text(json.dumps(defaults,indent=2)+'\n')
 # Remove only generated, unreferenced content-addressed build objects.

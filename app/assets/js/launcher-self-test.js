@@ -19,7 +19,7 @@ exports.install = function(app, BrowserWindow) {
                             const a = await require('./assets/js/authmanager').addMojangAccount('FluxoTeste', '')
                             return {server:d.getMainServer().rawServer.address, modules:d.getMainServer().modules.length, offline:a.type === 'offline', microsoft:!document.getElementById('loginOptionMicrosoft').disabled}
                         })()`)
-                        if (result.server !== '181.214.48.21:10101' || result.modules !== 115 || !result.offline || !result.microsoft) throw new Error('Packaged application validation failed')
+                        if (!result.server || !result.server.includes(':') || result.modules !== 115 || !result.offline || !result.microsoft) throw new Error('Packaged application validation failed')
                         fs.writeFileSync(path.join(output,'launcher.png'), (await win.webContents.capturePage()).toPNG())
                         break
                     }

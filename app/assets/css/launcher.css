@@ -3966,3 +3966,24 @@ input:checked + .toggleSwitchSlider:before {
 .rotating {
     animation: rotating 10s linear infinite;
 }
+/* Transparent NarutoFluxo branding: no old plate or circular crop. */
+#welcomeImageSeal, #loginImageSeal, #image_seal, #settingsAboutLogo {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    object-fit: contain;
+}
+#image_seal { width: 76px; height: 76px; }
+#image_seal_container { width: 76px; height: 76px; }
+#loadCenterImage { width: 188px; height: 188px; object-fit: contain; }
+#loadSpinnerImage {
+    width: 248px;
+    height: 248px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.12);
+    border-top-color: #ff9d19;
+    border-right-color: #39bfff;
+    animation-duration: 1.6s;
+}

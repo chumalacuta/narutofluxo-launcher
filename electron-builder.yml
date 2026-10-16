@@ -8,7 +8,7 @@ asar: true
 compression: 'maximum'
 
 files:
-  - '!{dist,bundle,tests,tools,artifacts,.gitignore,.vscode,docs,dev-app-update.yml,.nvmrc,.eslintrc.json}'
+  - '!{dist,bundle,tests,tools,artifacts,fluxo-local.json,.gitignore,.vscode,docs,dev-app-update.yml,.nvmrc,.eslintrc.json}'
 
 extraResources:
   - 'libraries'

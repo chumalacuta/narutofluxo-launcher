@@ -31,7 +31,7 @@ async function main() {
   const api = new DistributionAPI(temp,path.join(temp,'common'),path.join(temp,'instances'),server.url,false)
   const distro = await api.getDistribution()
   const target = distro.getMainServer()
-  assert.equal(target.rawServer.address, '181.214.48.21:10101')
+  assert.match(target.rawServer.address, /^[^\s:]+:\d+$/)
   assert.equal(target.effectiveJavaOptions.suggestedMajor, 8)
   assert.equal(target.modules.filter(m => m.rawModule.type === 'ForgeHosted').length, 1)
   const sample = target.modules.find(m => m.rawModule.artifact.path?.startsWith('mods/'))
