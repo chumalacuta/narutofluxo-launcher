@@ -1,6 +1,6 @@
 appId: 'helioslauncher'
 productName: 'Fluxo Launcher'
-artifactName: '${productName}-setup-${version}.${ext}'
+artifactName: 'Fluxo-Launcher-setup-${version}.${ext}'
 
 copyright: 'Copyright © 2018-2024 Silva'
 
